@@ -1,31 +1,34 @@
-apiVersion: ceph.rook.io/v1
-kind: CephBlockPool
+piVersion: v1
+kind: ConfigMap
 metadata:
-  name: replicapool
-  namespace: rook-ceph # namespace:cluster
-spec:
-  failureDomain: osd
-  replicated:
-    size: 1
-    # Disallow setting pool with replica 1, this could lead to data loss without recovery.
-    # Make sure you're *ABSOLUTELY CERTAIN* that is what you want
-    requireSafeReplicaSize: false
-    # gives a hint (%) to Ceph in terms of expected consumption of the total cluster capacity of a given pool
-    # for more info: https://docs.ceph.com/docs/master/rados/operations/placement-groups/#specifying-expected-pool-size
-    #targetSizeRatio: .5
+  name: rook-ceph-csi-kms-config
+  namespace: rook-ceph
+data:
+  config.json: |-
+    {
+      "vault": {
+        "encryptionKMSType": "vault",
+        "vaultAddress": "http://vault.vault.svc.cluster.local:8200",
+        "vaultAuthPath": "/v1/auth/kubernetes/login",
+        "vaultRole": "ceph-csi",
+        "vaultBackend": "kv-v2",
+        "vaultDestroyKeys": "true",
+        "vaultPassphraseRoot": "/v1/secret",
+        "vaultPassphrasePath": "ceph-csi/",
+        "vaultCAVerify": "false"
+      }
+    }
+
 ---
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: rook-ceph-block
+  name: rook-ceph-block-vault
 provisioner: rook-ceph.rbd.csi.ceph.com # csi-provisioner-name
 parameters:
   # clusterID is the namespace where the rook cluster is running
   # If you change this namespace, also change the namespace below where the secret namespaces are defined
   clusterID: rook-ceph # namespace:cluster
-
-  encrypted: "true"
-  encryptionKMSID: "user-secret-metadata"
 
   # If you want to use erasure coded pool with RBD, you need to create
   # two pools. one erasure coded and one replicated.
@@ -34,6 +37,9 @@ parameters:
   # The erasure coded pool must be set as the `dataPool` parameter below.
   #dataPool: ec-data-pool
   pool: replicapool
+
+  encrypted: "true"
+  encryptionKMSID: "vault"
 
   # RBD image format. Defaults to "2".
   imageFormat: "2"
@@ -56,3 +62,4 @@ parameters:
 #mounter: rbd-nbd
 allowVolumeExpansion: true
 reclaimPolicy: Delete
+

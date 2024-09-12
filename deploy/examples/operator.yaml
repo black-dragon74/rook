@@ -23,14 +23,14 @@ metadata:
   namespace: rook-ceph # namespace:operator
 data:
   # The logging level for the operator: ERROR | WARNING | INFO | DEBUG
-  ROOK_LOG_LEVEL: "INFO"
+  ROOK_LOG_LEVEL: "DEBUG"
 
   # Allow using loop devices for osds in test clusters.
   ROOK_CEPH_ALLOW_LOOP_DEVICES: "false"
 
   # Enable the CSI driver.
   # To run the non-default version of the CSI driver, see the override-able image properties in operator.yaml
-  ROOK_CSI_ENABLE_CEPHFS: "true"
+  ROOK_CSI_ENABLE_CEPHFS: "false"
   # Enable the default version of the CSI RBD driver. To start another version of the CSI driver, see image properties below.
   ROOK_CSI_ENABLE_RBD: "true"
   # Enable the CSI NFS driver. To start another version of the CSI driver, see image properties below.
@@ -39,7 +39,7 @@ data:
   ROOK_CSI_DISABLE_DRIVER: "false"
 
   # Set to true to enable Ceph CSI pvc encryption support.
-  CSI_ENABLE_ENCRYPTION: "false"
+  CSI_ENABLE_ENCRYPTION: "true"
 
   # Set to true to enable host networking for CSI CephFS and RBD nodeplugins. This may be necessary
   # in some network configurations where the SDN does not provide access to an external cluster or
@@ -62,11 +62,11 @@ data:
 
   # Set logging level for cephCSI containers maintained by the cephCSI.
   # Supported values from 0 to 5. 0 for general useful logs, 5 for trace level verbosity.
-  # CSI_LOG_LEVEL: "0"
+  CSI_LOG_LEVEL: "5"
 
   # Set logging level for Kubernetes-csi sidecar containers.
   # Supported values from 0 to 5. 0 for general useful logs (the default), 5 for trace level verbosity.
-  # CSI_SIDECAR_LOG_LEVEL: "0"
+  CSI_SIDECAR_LOG_LEVEL: "5"
 
   # csi driver name prefix for cephfs, rbd and nfs. if not specified, default
   # will be the namespace name where rook-ceph operator is deployed.
@@ -114,7 +114,7 @@ data:
   CSI_NFS_FSGROUPPOLICY: "File"
 
   # (Optional) Allow starting unsupported ceph-csi image
-  ROOK_CSI_ALLOW_UNSUPPORTED_VERSION: "false"
+  ROOK_CSI_ALLOW_UNSUPPORTED_VERSION: "true"
 
   # (Optional) control the host mount of /etc/selinux for csi plugin pods.
   CSI_PLUGIN_ENABLE_SELINUX_HOST_MOUNT: "false"
@@ -122,7 +122,7 @@ data:
   # The default version of CSI supported by Rook will be started. To change the version
   # of the CSI driver to something other than what is officially supported, change
   # these images to the desired release of the CSI driver.
-  # ROOK_CSI_CEPH_IMAGE: "quay.io/cephcsi/cephcsi:v3.11.0"
+  ROOK_CSI_CEPH_IMAGE: "quay.io/niryadav/cephcsi:latest"
   # ROOK_CSI_REGISTRAR_IMAGE: "registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.10.1"
   # ROOK_CSI_RESIZER_IMAGE: "registry.k8s.io/sig-storage/csi-resizer:v1.10.1"
   # ROOK_CSI_PROVISIONER_IMAGE: "registry.k8s.io/sig-storage/csi-provisioner:v4.0.1"
@@ -130,7 +130,7 @@ data:
   # ROOK_CSI_ATTACHER_IMAGE: "registry.k8s.io/sig-storage/csi-attacher:v4.5.1"
 
   # To indicate the image pull policy to be applied to all the containers in the csi driver pods.
-  # ROOK_CSI_IMAGE_PULL_POLICY: "IfNotPresent"
+  ROOK_CSI_IMAGE_PULL_POLICY: "Always"
 
   # (Optional) set user created priorityclassName for csi plugin pods.
   CSI_PLUGIN_PRIORITY_CLASSNAME: "system-node-critical"
@@ -500,10 +500,10 @@ data:
   # The timeout value (in seconds) of Ceph commands. It should be >= 1. If this variable is not set or is an invalid value, it's default to 15.
   ROOK_CEPH_COMMANDS_TIMEOUT_SECONDS: "15"
   # Enable the csi addons sidecar.
-  CSI_ENABLE_CSIADDONS: "false"
+  CSI_ENABLE_CSIADDONS: "true"
   # Enable watch for faster recovery from rbd rwo node loss
   ROOK_WATCH_FOR_NODE_FAILURE: "true"
-  # ROOK_CSIADDONS_IMAGE: "quay.io/csiaddons/k8s-sidecar:v0.8.0"
+  ROOK_CSIADDONS_IMAGE: "quay.io/niryadav/k8s-sidecar:latest"
   # The CSI GRPC timeout value (in seconds). It should be >= 120. If this variable is not set or is an invalid value, it's default to 150.
   CSI_GRPC_TIMEOUT_SECONDS: "150"
 
